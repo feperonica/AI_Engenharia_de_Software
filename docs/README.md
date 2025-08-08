@@ -1,62 +1,46 @@
-# README.md
+# Aplicativo do Clima – Python + Open-Meteo | HTML + CSS + JavaScript
 
-## Aplicativo do Clima – Python + Open-Meteo
+## 📋 Descrição
+Este projeto contém **duas versões** de um aplicativo de previsão do tempo usando a API pública **Open-Meteo**:
 
-### 📋 Descrição
-Este projeto é um aplicativo de previsão do tempo em Python que utiliza a API pública **Open-Meteo** para:
-- Exibir o clima atual em múltiplas cidades com **cache** de 1 hora.
-- Mostrar a previsão de **5 dias** com temperaturas mínimas e máximas.
-- Tratar erros de conexão ou falha na API.
-- Realizar dois testes básicos para validar o funcionamento.
+1. **Versão Python** (`weather_app_final.py`):
+   - Exibe o clima atual em múltiplas cidades com **cache** de 1 hora.
+   - Mostra a previsão de **5 dias** com temperaturas mínimas e máximas.
+   - Inclui testes básicos para validar funcionamento.
+   - Desenvolvido como prática de desenvolvimento iterativo com assistência de IA na **Generation Brasil**.
 
-Este projeto foi desenvolvido como prática de desenvolvimento iterativo com assistência de IA na **Generation Brasil**.
+2. **Versão HTML + CSS + JavaScript** (`index.html`, `style.css`, `app.js`):
+   - Interface web responsiva, sem dependências externas.
+   - Busca de cidade com **Open-Meteo Geocoding** e fallback **Nominatim/OSM**.
+   - Clima atual e previsão de 5 dias com cache de 1 hora no `localStorage`.
+   - Troca de unidades °C/°F.
+   - Funciona diretamente no navegador.
 
 ---
 
-### 🚀 Funcionalidades
+## 🚀 Funcionalidades
+
+### Python
 - **Clima Atual**: Consulta e exibe a temperatura em tempo real.
 - **Cache Inteligente**: Evita requisições repetidas à API dentro de 1 hora.
 - **Previsão de 5 Dias**: Mostra as mínimas e máximas diárias.
 - **Tratamento de Erros**: Mensagens claras para problemas de rede ou ausência de dados.
 - **Testes Automatizados**: Valida resposta da API e funcionamento do cache.
 
+### HTML + CSS + JavaScript
+- **Busca de Cidade**: Digite o nome da cidade para obter coordenadas automaticamente.
+- **Fallback de Geocoding**: Caso Open-Meteo falhe, utiliza Nominatim (OpenStreetMap).
+- **Clima Atual + Previsão**: Temperatura, descrição (WMO) e previsão de 5 dias.
+- **Cache Local**: `localStorage` com expiração de 1 hora.
+- **Troca de Unidades**: °C ↔ °F.
+- **Interface Responsiva**: CSS adaptado para desktop e mobile.
+
 ---
 
-### 📦 Requisitos
+## 📦 Requisitos
+
+### Python
 - Python 3.8 ou superior
 - Biblioteca `requests`
-
-Instale com:
 ```bash
 pip install requests
-```
-
----
-
-### ▶️ Como Executar
-1. Clone ou baixe este repositório.
-2. Instale as dependências (`requests`).
-3. Execute o script:
-```bash
-python weather_app_final.py
-```
-
----
-
-### 🧪 Testes
-Os testes são executados automaticamente no final do script:
-- **`test_api_response`**: Confirma se a API retorna dados válidos.
-- **`test_cache_functionality`**: Verifica se o cache é reutilizado corretamente.
-
----
-
-### 🔒 Segurança & Ética
-- Nenhuma chave de API sensível é utilizada.
-- Não há bibliotecas com licenciamento restritivo.
-- Código revisado manualmente após sugestões da IA.
-- Em projetos reais, armazene chaves e credenciais usando **variáveis de ambiente**.
-
----
-
-### 📜 Licença
-Projeto de uso livre para fins educacionais e de prática.

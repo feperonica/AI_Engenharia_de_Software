@@ -1,0 +1,76 @@
+:root {
+  color-scheme: light dark;
+  --bg1: #eef7ff;
+  --bg2: #ffffff;
+  --fg: #0b1324;
+  --muted: #5a667a;
+  --border: #d7e3f0;
+  --accent: #2b7fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg1: #0d1117;
+    --bg2: #0b0f14;
+    --fg: #e6eef8;
+    --muted: #9aa8be;
+    --border: #1f2937;
+    --accent: #4da3ff;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: var(--fg);
+}
+.container { max-width: 960px; margin: 0 auto; padding: 24px; }
+.header h1 { margin: 0 0 12px; font-size: 28px; }
+.controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.search { display: flex; gap: 8px; }
+input, select, button {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #ffffff10;
+  color: var(--fg);
+}
+button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:hover { filter: brightness(1.05); }
+.hints { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.results { margin-top: 16px; }
+.suggestions { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.suggestions li {
+  border: 1px solid var(--border);
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+}
+.suggestions li:hover { background: #00000010; }
+.status { margin-top: 8px; font-size: 14px; color: var(--muted); min-height: 18px; }
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; margin-top: 16px; }
+@media (min-width: 800px) { .grid { grid-template-columns: 1fr 1fr; } }
+.card {
+  background: #ffffff20;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+}
+.card h2, .card h3 { margin: 0 0 8px; }
+.current { display: flex; gap: 16px; align-items: center; }
+.temp { font-size: 56px; font-weight: 700; }
+.meta { color: var(--muted); font-size: 14px; }
+.forecast { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.day {
+  border: 1px solid var(--border);
+  border-radius: 12px; padding: 8px;
+}
+.day .date { font-size: 12px; color: var(--muted); }
+.footer { margin-top: 24px; font-size: 12px; color: var(--muted); }
+.skeleton { background: #00000010; border-radius: 8px; height: 18px; width: 100%; animation: pulse 1.2s infinite; }
+@keyframes pulse {
+  0% { opacity: .5; } 50% { opacity: 1; } 100% { opacity: .5; }
+}

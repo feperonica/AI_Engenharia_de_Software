@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>🌦️ Clima App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="./style.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>🌦️ Clima App</h1>
+      <div class="controls">
+        <div class="search">
+          <input id="q" type="text" placeholder="Digite a cidade (ex: Campinas)" />
+          <button id="btnSearch">Buscar</button>
+        </div>
+        <select id="unit">
+          <option value="celsius">°C</option>
+          <option value="fahrenheit">°F</option>
+        </select>
+      </div>
+      <div class="hints">Dica: você pode pressionar Enter para buscar. Se não encontrar, tente “Cidade, BR”.</div>
+    </header>
+
+    <section class="results">
+      <ul id="suggestions" class="suggestions"></ul>
+      <div id="status" class="status"></div>
+    </section>
+
+    <main class="grid">
+      <article class="card" id="currentCard">
+        <h2 id="cityTitle">—</h2>
+        <div id="currentBody" class="current">
+          <div class="temp" id="tempNow">--°</div>
+          <div class="meta">
+            <div id="descNow">—</div>
+            <div id="windNow">Vento: — km/h</div>
+            <div id="dayNow">—</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>📅 Próximos 5 dias</h3>
+        <div id="forecast" class="forecast"></div>
+      </article>
+    </main>
+
+    <footer class="footer">
+      Fonte: Open‑Meteo (forecast & variáveis atuais) • Fallback geocoding: Nominatim/OSM • Cache local por 1h
+    </footer>
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>
