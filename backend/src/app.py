@@ -1,6 +1,9 @@
 import requests
 
-def buscar_clima(cidade, unidade="celsius"):
+API_URL = "https://api.open-meteo.com/v1/forecast"
+COORDENADAS = {"latitude": -23.55, "longitude": -46.63}
+
+def buscar_clima(cidade="São Paulo", unidade="celsius", coordenadas=COORDENADAS):
     """
     Obtém a temperatura atual para uma cidade usando a API Open-Meteo, com base em coordenadas fixas (São Paulo).
 
@@ -30,11 +33,7 @@ def buscar_clima(cidade, unidade="celsius"):
     """
 
     # Coordenadas fixas para São Paulo como exemplo (ideal: usar API de geocodificação)
-    coordenadas = {
-        "latitude": -23.55,
-        "longitude": -46.63
-    }
-
+  
     params = {
         "latitude": coordenadas["latitude"],
         "longitude": coordenadas["longitude"],
@@ -43,19 +42,22 @@ def buscar_clima(cidade, unidade="celsius"):
     }
 
     try:
-        resposta = requests.get("https://api.open-meteo.com/v1/forecast", params=params)
+        resposta = requests.get(API_URL, params=params)
         resposta.raise_for_status()
         dados = resposta.json()
 
         if "current_weather" in dados:
-            clima = dados["current_weather"]
-            temperatura = clima["temperature"]
+            temperatura = dados["current_weather"]["temperature"]
             print(f"Temperatura atual em {cidade}: {temperatura}°{'F' if unidade == 'fahrenheit' else 'C'}")
-            return clima
+            return dados["current_weather"]
         else:
-            print("Dados de clima não encontrados na resposta.")
+            print("Dados de clima não encontrados.")
             return None
 
     except requests.exceptions.RequestException as e:
         print(f"Erro na requisição: {e}")
         return None
+
+if __name__ == "__main__":
+    print("Script iniciou com sucesso.")
+    buscar_clima()
