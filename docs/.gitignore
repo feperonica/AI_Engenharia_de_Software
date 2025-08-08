@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.env
+.env
+*.venv
+venv/
+env/
+*.log
+
+# Node.js / JavaScript (caso vá usar um front-end com JS)
+node_modules/
+dist/
+build/
+*.log
+
+# VSCode
+.vscode/
+.history/
+
+# Sistema
+.DS_Store
+Thumbs.db
