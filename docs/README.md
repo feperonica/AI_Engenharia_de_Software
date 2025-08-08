@@ -1,90 +1,62 @@
-# 🌤️ Clima App
+# README.md
 
-Aplicativo simples que consulta o clima atual de qualquer cidade utilizando a [API Open-Meteo](https://open-meteo.com/).
+## Aplicativo do Clima – Python + Open-Meteo
 
-Este projeto combina um **back-end em Python** com um **front-end em JavaScript**, demonstrando como consumir APIs públicas de forma eficaz com auxílio de ferramentas de IA.
+### 📋 Descrição
+Este projeto é um aplicativo de previsão do tempo em Python que utiliza a API pública **Open-Meteo** para:
+- Exibir o clima atual em múltiplas cidades com **cache** de 1 hora.
+- Mostrar a previsão de **5 dias** com temperaturas mínimas e máximas.
+- Tratar erros de conexão ou falha na API.
+- Realizar dois testes básicos para validar o funcionamento.
 
----
-
-## 🗂 Estrutura do Projeto
-
-```
-clima-app/
-├── backend/
-│   ├── src/
-│   │   └── app.py
-│   ├── requirements.txt
-│   └── README.md
-│
-├── frontend/
-│   ├── index.html
-│   ├── script.js
-│   └── style.css (opcional)
-│
-├── .gitignore
-└── README.md
-```
+Este projeto foi desenvolvido como prática de desenvolvimento iterativo com assistência de IA na **Generation Brasil**.
 
 ---
 
-## ⚙️ Tecnologias Utilizadas
-
-- Python 3
-- JavaScript
-- HTML5
-- [Open-Meteo API](https://open-meteo.com/)
-- [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api)
-- Ferramentas de IA: ChatGPT, GitHub Copilot
+### 🚀 Funcionalidades
+- **Clima Atual**: Consulta e exibe a temperatura em tempo real.
+- **Cache Inteligente**: Evita requisições repetidas à API dentro de 1 hora.
+- **Previsão de 5 Dias**: Mostra as mínimas e máximas diárias.
+- **Tratamento de Erros**: Mensagens claras para problemas de rede ou ausência de dados.
+- **Testes Automatizados**: Valida resposta da API e funcionamento do cache.
 
 ---
 
-## 🚀 Como Usar
+### 📦 Requisitos
+- Python 3.8 ou superior
+- Biblioteca `requests`
 
-### 🐍 Backend (Python)
-
-1. Navegue até `clima-app/backend/`
-2. Instale as dependências:
-
+Instale com:
 ```bash
-pip install -r requirements.txt
+pip install requests
 ```
 
-3. Rode o script de teste:
+---
 
+### ▶️ Como Executar
+1. Clone ou baixe este repositório.
+2. Instale as dependências (`requests`).
+3. Execute o script:
 ```bash
-python src/app.py
+python weather_app_final.py
 ```
 
 ---
 
-### 🌐 Frontend (JavaScript)
-
-1. Navegue até `clima-app/frontend/`
-2. Abra o arquivo `index.html` em um navegador (Chrome, Firefox etc.)
-3. Digite o nome de uma cidade e clique em "Buscar" para ver a temperatura e velocidade do vento atuais.
-
----
-
-## ✅ Funcionalidades
-
-- Busca de clima com entrada de nome da cidade.
-- Conversão automática de nome de cidade para latitude/longitude via Geocoding API.
-- Exibição de temperatura e vento atual.
-- Tratamento de erros para entradas inválidas ou falhas da API.
-- Interface simples, amigável e pronta para personalização.
+### 🧪 Testes
+Os testes são executados automaticamente no final do script:
+- **`test_api_response`**: Confirma se a API retorna dados válidos.
+- **`test_cache_functionality`**: Verifica se o cache é reutilizado corretamente.
 
 ---
 
-## 💡 Aprendizados
-
-Este projeto foi desenvolvido como parte da trilha **AI-SWE** da Generation, aplicando:
-- Refinamento de prompts com TRACI
-- Depuração assistida por IA
-- Testes automatizados baseados em sugestões da IA
+### 🔒 Segurança & Ética
+- Nenhuma chave de API sensível é utilizada.
+- Não há bibliotecas com licenciamento restritivo.
+- Código revisado manualmente após sugestões da IA.
+- Em projetos reais, armazene chaves e credenciais usando **variáveis de ambiente**.
 
 ---
 
-## 📁 Licença
-
-Uso educacional. Você pode reutilizar e adaptar este código livremente.
-
+### 📜 Licença
+Projeto de uso livre para fins educacionais e de prática.
