@@ -1,63 +1,90 @@
 import requests
+import time
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
-COORDENADAS = {"latitude": -23.55, "longitude": -46.63}
+TEMPO_EXPIRACAO = 60 * 60  # 60 minutos
+cache = {}
 
-def buscar_clima(cidade="São Paulo", unidade="celsius", coordenadas=COORDENADAS):
+# Lista de cidades com coordenadas fixas
+cidades = [
+    {"nome": "São Paulo", "lat": -23.55, "lon": -46.63},
+    {"nome": "Rio de Janeiro", "lat": -22.91, "lon": -43.17},
+    {"nome": "Recife", "lat": -8.05, "lon": -34.88}
+]
+
+def buscar_clima_com_cache(nome, lat, lon, unidade="celsius"):
     """
-    Obtém a temperatura atual para uma cidade usando a API Open-Meteo, com base em coordenadas fixas (São Paulo).
-
-    Esta função envia uma requisição à API Open-Meteo para obter os dados meteorológicos atuais
-    com base em coordenadas predefinidas. O nome da cidade é usado apenas para exibição no console.
-
-    Args:
-        cidade (str): Nome da cidade para exibição (não afeta a busca real).
-        unidade (str, opcional): Unidade de temperatura desejada. Aceita "celsius" (padrão) ou "fahrenheit".
-
-    Returns:
-        dict: Dicionário com dados do clima contendo:
-            - temperature (float): Temperatura atual.
-            - windspeed (float): Velocidade do vento em km/h.
-            - winddirection (float): Direção do vento em graus.
-            - weathercode (int): Código numérico representando o tempo atual.
-            - time (str): Data e hora da coleta dos dados.
-        Retorna None se a requisição falhar ou os dados estiverem ausentes.
-
-    Raises:
-        requests.exceptions.RequestException: Em caso de falha na requisição HTTP.
-
-    Example:
-        >>> buscar_clima("São Paulo", "celsius")
-        Temperatura atual em São Paulo: 24°C
-        {'temperature': 24.0, 'windspeed': 10.2, 'winddirection': 220, 'weathercode': 2, 'time': '2025-08-07T12:00'}
+    Busca o clima atual com cache (1h) usando latitude e longitude.
     """
+    chave_cache = f"{nome.lower()}_{unidade}"
+    agora = time.time()
 
-    # Coordenadas fixas para São Paulo como exemplo (ideal: usar API de geocodificação)
-  
-    params = {
-        "latitude": coordenadas["latitude"],
-        "longitude": coordenadas["longitude"],
-        "current_weather": True,
-        "temperature_unit": unidade
-    }
+    if chave_cache in cache:
+        tempo_salvo = cache[chave_cache]["timestamp"]
+        if agora - tempo_salvo < TEMPO_EXPIRACAO:
+            clima = cache[chave_cache]["dados"]
+            print(f"🧠 [CACHE] {nome}: {clima['temperature']}°{'F' if unidade == 'fahrenheit' else 'C'}")
+            return clima
 
     try:
-        resposta = requests.get(API_URL, params=params)
+        resposta = requests.get(API_URL, params={
+            "latitude": lat,
+            "longitude": lon,
+            "current_weather": True,
+            "temperature_unit": unidade
+        })
+        resposta.raise_for_status()
+        dados = resposta.json().get("current_weather")
+
+        if dados:
+            cache[chave_cache] = {
+                "dados": dados,
+                "timestamp": agora
+            }
+            print(f"🌐 [API] {nome}: {dados['temperature']}°{'F' if unidade == 'fahrenheit' else 'C'}")
+            return dados
+        else:
+            print(f"⚠️ Clima não encontrado para {nome}")
+            return None
+
+    except Exception as e:
+        print(f"❌ Erro ao buscar clima para {nome}: {e}")
+        return None
+
+def previsao_5_dias(nome, lat, lon, unidade="celsius"):
+    """
+    Busca e exibe a previsão de 5 dias (min/máx) usando a API Open-Meteo.
+    """
+    try:
+        resposta = requests.get(API_URL, params={
+            "latitude": lat,
+            "longitude": lon,
+            "daily": "temperature_2m_max,temperature_2m_min",
+            "timezone": "auto",
+            "temperature_unit": unidade
+        })
         resposta.raise_for_status()
         dados = resposta.json()
 
-        if "current_weather" in dados:
-            temperatura = dados["current_weather"]["temperature"]
-            print(f"Temperatura atual em {cidade}: {temperatura}°{'F' if unidade == 'fahrenheit' else 'C'}")
-            return dados["current_weather"]
-        else:
-            print("Dados de clima não encontrados.")
-            return None
+        dias = dados["daily"]["time"]
+        temp_max = dados["daily"]["temperature_2m_max"]
+        temp_min = dados["daily"]["temperature_2m_min"]
 
-    except requests.exceptions.RequestException as e:
-        print(f"Erro na requisição: {e}")
-        return None
+        print(f"\n📅 Previsão de 5 dias para {nome}:\n")
+        for i in range(5):
+            print(f"{dias[i]} ➤ {temp_min[i]}° / {temp_max[i]}° {'F' if unidade == 'fahrenheit' else 'C'}")
+    except Exception as e:
+        print(f"❌ Erro ao buscar previsão para {nome}: {e}")
 
 if __name__ == "__main__":
-    print("Script iniciou com sucesso.")
-    buscar_clima()
+    print("🌦️ Buscando clima atual com cache e previsão de 5 dias...\n")
+
+    for cidade in cidades:
+        nome = cidade["nome"]
+        lat = cidade["lat"]
+        lon = cidade["lon"]
+
+        buscar_clima_com_cache(nome, lat, lon)
+        previsao_5_dias(nome, lat, lon)
+
+    print("\n✅ Finalizado.")
