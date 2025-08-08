@@ -1,90 +1,116 @@
+# weather_app_final.py
 import requests
 import time
 
 API_URL = "https://api.open-meteo.com/v1/forecast"
-TEMPO_EXPIRACAO = 60 * 60  # 60 minutos
+CACHE_EXPIRATION = 60 * 60  # 1 hora em segundos
 cache = {}
 
-# Lista de cidades com coordenadas fixas
-cidades = [
-    {"nome": "São Paulo", "lat": -23.55, "lon": -46.63},
-    {"nome": "Rio de Janeiro", "lat": -22.91, "lon": -43.17},
-    {"nome": "Recife", "lat": -8.05, "lon": -34.88}
-]
-
-def buscar_clima_com_cache(nome, lat, lon, unidade="celsius"):
+# --- Funcionalidade principal: Obter clima atual com cache e tratamento de erros ---
+def get_current_weather(city_name, lat, lon, unit="celsius"):
     """
-    Busca o clima atual com cache (1h) usando latitude e longitude.
+    Busca o clima atual de uma cidade, usando cache em memória para reduzir chamadas à API.
     """
-    chave_cache = f"{nome.lower()}_{unidade}"
-    agora = time.time()
+    cache_key = f"{city_name.lower()}_{unit}"
+    now = time.time()
 
-    if chave_cache in cache:
-        tempo_salvo = cache[chave_cache]["timestamp"]
-        if agora - tempo_salvo < TEMPO_EXPIRACAO:
-            clima = cache[chave_cache]["dados"]
-            print(f"🧠 [CACHE] {nome}: {clima['temperature']}°{'F' if unidade == 'fahrenheit' else 'C'}")
-            return clima
+    # Verifica se há cache válido
+    if cache_key in cache:
+        cached_time = cache[cache_key]["timestamp"]
+        if now - cached_time < CACHE_EXPIRATION:
+            print(f"🧠 [CACHE] {city_name}: {cache[cache_key]['data']['temperature']}°{unit[0].upper()}")
+            return cache[cache_key]["data"]
 
     try:
-        resposta = requests.get(API_URL, params={
+        response = requests.get(API_URL, params={
             "latitude": lat,
             "longitude": lon,
             "current_weather": True,
-            "temperature_unit": unidade
+            "temperature_unit": unit
         })
-        resposta.raise_for_status()
-        dados = resposta.json().get("current_weather")
+        response.raise_for_status()
+        data = response.json().get("current_weather")
 
-        if dados:
-            cache[chave_cache] = {
-                "dados": dados,
-                "timestamp": agora
-            }
-            print(f"🌐 [API] {nome}: {dados['temperature']}°{'F' if unidade == 'fahrenheit' else 'C'}")
-            return dados
-        else:
-            print(f"⚠️ Clima não encontrado para {nome}")
-            return None
+        if not data:
+            raise ValueError("Nenhum dado de clima retornado pela API.")
 
+        cache[cache_key] = {"data": data, "timestamp": now}
+        print(f"🌐 [API] {city_name}: {data['temperature']}°{unit[0].upper()}")
+        return data
+
+    except requests.RequestException as e:
+        print(f"❌ Erro na requisição da API para {city_name}: {e}")
+        return None
     except Exception as e:
-        print(f"❌ Erro ao buscar clima para {nome}: {e}")
+        print(f"⚠️ Erro inesperado para {city_name}: {e}")
         return None
 
-def previsao_5_dias(nome, lat, lon, unidade="celsius"):
-    """
-    Busca e exibe a previsão de 5 dias (min/máx) usando a API Open-Meteo.
-    """
+
+# --- Funcionalidade avançada: Previsão para 5 dias ---
+def get_5_day_forecast(city_name, lat, lon, unit="celsius"):
+    """Busca e imprime a previsão de 5 dias com temperaturas mínimas e máximas."""
     try:
-        resposta = requests.get(API_URL, params={
+        response = requests.get(API_URL, params={
             "latitude": lat,
             "longitude": lon,
             "daily": "temperature_2m_max,temperature_2m_min",
             "timezone": "auto",
-            "temperature_unit": unidade
+            "temperature_unit": unit
         })
-        resposta.raise_for_status()
-        dados = resposta.json()
+        response.raise_for_status()
+        data = response.json()["daily"]
 
-        dias = dados["daily"]["time"]
-        temp_max = dados["daily"]["temperature_2m_max"]
-        temp_min = dados["daily"]["temperature_2m_min"]
-
-        print(f"\n📅 Previsão de 5 dias para {nome}:\n")
+        print(f"\n📅 Previsão de 5 dias para {city_name}:")
         for i in range(5):
-            print(f"{dias[i]} ➤ {temp_min[i]}° / {temp_max[i]}° {'F' if unidade == 'fahrenheit' else 'C'}")
+            print(f"{data['time'][i]} ➤ {data['temperature_2m_min'][i]}° / {data['temperature_2m_max'][i]}° {unit[0].upper()}")
+
     except Exception as e:
-        print(f"❌ Erro ao buscar previsão para {nome}: {e}")
+        print(f"❌ Falha ao buscar a previsão para {city_name}: {e}")
+
+
+# --- Cidades a serem consultadas ---
+cities = [
+    {"name": "São Paulo", "lat": -23.55, "lon": -46.63},
+    {"name": "Recife", "lat": -8.05, "lon": -34.88}
+]
 
 if __name__ == "__main__":
-    print("🌦️ Buscando clima atual com cache e previsão de 5 dias...\n")
+    print("🌦️ Aplicativo do Clima - Clima Atual e Previsão\n")
+    for city in cities:
+        get_current_weather(city["name"], city["lat"], city["lon"])
+        get_5_day_forecast(city["name"], city["lat"], city["lon"])
 
-    for cidade in cidades:
-        nome = cidade["nome"]
-        lat = cidade["lat"]
-        lon = cidade["lon"]
 
-        buscar_clima_com_cache(nome, lat, lon)
-        previsao_5_dias(nome, lat, lon)
+# --- Testes básicos ---
+def test_api_response():
+    """Testa se a API retorna dados de clima válidos."""
+    data = get_current_weather("Cidade Teste", -23.55, -46.63)
+    assert data is not None and "temperature" in data
+    print("✅ test_api_response passou com sucesso")
 
-    print("\n✅ Finalizado.")
+def test_cache_functionality():
+    """Testa se o resultado em cache é reutilizado dentro do tempo de expiração."""
+    start = time.time()
+    get_current_weather("Cidade Cache", -23.55, -46.63)
+    first_duration = time.time() - start
+
+    start = time.time()
+    get_current_weather("Cidade Cache", -23.55, -46.63)  # Deve vir do cache
+    second_duration = time.time() - start
+
+    assert second_duration < first_duration
+    print("✅ test_cache_functionality passou com sucesso")
+
+# Executar testes
+    print("\n🧪 Executando Testes...")
+    test_api_response()
+    test_cache_functionality()
+
+
+# --- Nota sobre Segurança & Ética ---
+"""
+Este código não utiliza nenhuma chave de API sensível.
+Em projetos reais com APIs privadas, use variáveis de ambiente e nunca armazene dados sensíveis diretamente no código.
+Também não foi usada nenhuma biblioteca de terceiros com licenciamento restritivo.
+Todo o código foi revisado com apoio da IA, mas avaliado criticamente antes da implementação.
+"""
